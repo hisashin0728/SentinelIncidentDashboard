@@ -12,3 +12,8 @@
 ![image](https://github.com/user-attachments/assets/3cd832e6-cb99-4480-9834-7948cd0b13c5)
 - 「ギャラリーテンプレート」に対して、[json ファイル](https://raw.githubusercontent.com/hisashin0728/SentinelIncidentDashboard/refs/heads/main/dashboard.json)を適用して保存して下さい。
 ![image](https://github.com/user-attachments/assets/77c6dccd-9c6f-437a-a1de-35449dfcaf2a)
+
+# 免責事項
+- 本レポジトリによって発生するコストについては、利用するユーザーが責任を負います。
+- 本レポジトリによって作成される環境から出力される内容について、作成者は責任を負いません。
+- 本レポジトリはオープンソースです。
