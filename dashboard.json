@@ -1,0 +1,202 @@
+{
+  "version": "Notebook/1.0",
+  "items": [
+    {
+      "type": 1,
+      "content": {
+        "json": "## Defender XDR インシデントの可視化\n---\n\n本ワークブックはカスタムで作成した Microsoft Sentinel のワークブックです。\nUnified XDR にて統合されたアラート/インシデントの状態を可視化させています。"
+      },
+      "name": "text - 2"
+    },
+    {
+      "type": 9,
+      "content": {
+        "version": "KqlParameterItem/1.0",
+        "parameters": [
+          {
+            "id": "163360da-55c0-4d6b-9eb0-b597387bcc23",
+            "version": "KqlParameterItem/1.0",
+            "name": "TimeHistory",
+            "type": 4,
+            "typeSettings": {
+              "selectableValues": [
+                {
+                  "durationMs": 300000
+                },
+                {
+                  "durationMs": 900000
+                },
+                {
+                  "durationMs": 1800000
+                },
+                {
+                  "durationMs": 3600000
+                },
+                {
+                  "durationMs": 14400000
+                },
+                {
+                  "durationMs": 43200000
+                },
+                {
+                  "durationMs": 86400000
+                },
+                {
+                  "durationMs": 172800000
+                },
+                {
+                  "durationMs": 259200000
+                },
+                {
+                  "durationMs": 604800000
+                },
+                {
+                  "durationMs": 1209600000
+                },
+                {
+                  "durationMs": 2419200000
+                },
+                {
+                  "durationMs": 2592000000
+                },
+                {
+                  "durationMs": 5184000000
+                },
+                {
+                  "durationMs": 7776000000
+                }
+              ]
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "value": {
+              "durationMs": 2592000000
+            }
+          }
+        ],
+        "style": "pills",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces"
+      },
+      "name": "Parameter"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "SecurityIncident\r\n| summarize arg_max(TimeGenerated, *) by IncidentName\r\n| summarize count() by Severity",
+        "size": 1,
+        "title": "インシデント重要度状況",
+        "timeContextFromParameter": "TimeHistory",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "piechart"
+      },
+      "customWidth": "25",
+      "name": "IncidentSeverity"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "SecurityIncident\r\n| where TimeGenerated > ago(30d)\r\n| summarize arg_max(TimeGenerated, *) by IncidentName\r\n| summarize count() by Status",
+        "size": 1,
+        "title": "インシデントステータス状況",
+        "timeContextFromParameter": "TimeHistory",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "piechart"
+      },
+      "customWidth": "25",
+      "name": "IncidentStatus"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "SecurityIncident\r\n| summarize arg_max(TimeGenerated, *) by IncidentName\r\n| mv-expand AdditionalData.alertProductNames\r\n| summarize count() by tostring(AdditionalData_alertProductNames)",
+        "size": 0,
+        "title": "Defender XDR 検出元情報",
+        "timeContextFromParameter": "TimeHistory",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "tiles",
+        "tileSettings": {
+          "titleContent": {
+            "columnMatch": "XdrSource",
+            "formatter": 1
+          },
+          "subtitleContent": {
+            "columnMatch": "AdditionalData_alertProductNames"
+          },
+          "leftContent": {
+            "columnMatch": "count_",
+            "formatter": 12,
+            "formatOptions": {
+              "palette": "auto"
+            },
+            "numberFormat": {
+              "unit": 17,
+              "options": {
+                "maximumSignificantDigits": 3,
+                "maximumFractionDigits": 2
+              }
+            }
+          },
+          "showBorder": false
+        }
+      },
+      "customWidth": "50",
+      "name": "XDRSource",
+      "styleSettings": {
+        "margin": "25"
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "SecurityIncident\r\n| where TimeGenerated > ago(30d)\r\n| summarize arg_max(TimeGenerated, *) by IncidentName\r\n| extend AssignName = tostring(parse_json(tostring(Comments[0].author)).name)\r\n| summarize count() by AssignName",
+        "size": 1,
+        "title": "インシデント担当者アサイン状況",
+        "timeContextFromParameter": "TimeHistory",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "piechart"
+      },
+      "customWidth": "50",
+      "name": "AssignName"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "SecurityIncident\n| summarize arg_max(TimeGenerated, *) by IncidentName\n| extend alertsCount_ = tostring(AdditionalData.alertsCount)\n| project TimeGenerated, XDR_id=toint(ProviderIncidentId), Title, Severity, Status,alertsCount_, ModifiedBy, Classification,ClassificationReason,ClassificationComment\n| order by XDR_id",
+        "size": 2,
+        "title": "Defender XDR Incident",
+        "timeContextFromParameter": "TimeHistory",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "table",
+        "gridSettings": {
+          "formatters": [
+            {
+              "columnMatch": "alertsCount_",
+              "formatter": 8,
+              "formatOptions": {
+                "palette": "orangeDark"
+              }
+            }
+          ]
+        }
+      },
+      "name": "IncidentList"
+    }
+  ],
+  "fallbackResourceIds": [
+    "/subscriptions/3e4358ef-317d-47c8-84ad-0845ffdab0b8/resourcegroups/rg-mgmt-sentinel-ae/providers/microsoft.operationalinsights/workspaces/law-mgmt-sentinel-ae"
+  ],
+  "fromTemplateId": "sentinel-UserWorkbook",
+  "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+}
