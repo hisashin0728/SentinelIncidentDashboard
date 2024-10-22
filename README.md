@@ -1,0 +1,2 @@
+# SentinelIncidentDashboard
+本レポジトリは Microsoft Sentinel のインシデントを可視化するためのダッシュボードブックを提供しています。
